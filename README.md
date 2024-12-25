@@ -232,11 +232,11 @@ git lfs install
 ```
 git clone https://github.com/advantech-edge-ai/edge_agent.git
 ```
-#### Note
-- Cat tvm splited files together
+#### Notes
+- In order to join tvm splited files into the tvm-0.15.0-cp310-cp310-linux_aarch64.whl
 > $ cd edge_agent/pre_install
 > $ bash split-cat-tvm.sh
-- You need to place the nanodb folder **from pre_install to** /ssd/jetson-containers/data/
+- Place the nanodb folder **from pre_install to** /ssd/jetson-containers/data/
 > $ mv nanodb /ssd/jetson-container/data/
 - move forbidden_zone folder **from pre_install to** /ssd/jetson-containers/data/images/
 > $ mv forbidden_zone /ssd/jetson-container/data/images/
