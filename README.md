@@ -235,6 +235,7 @@ git clone https://github.com/advantech-edge-ai/edge_agent.git
 #### Notes
 - In order to join tvm splited files into the tvm-0.15.0-cp310-cp310-linux_aarch64.whl
 > $ cd edge_agent/pre_install
+> 
 > $ bash split-cat-tvm.sh
 - Place the nanodb folder **from pre_install to** /ssd/jetson-containers/data/
 > $ mv nanodb /ssd/jetson-container/data/
