@@ -232,13 +232,16 @@ git lfs install
 ```
 git clone https://github.com/advantech-edge-ai/edge_agent.git
 ```
-
-- #Note You need to place the nanodb folder **from pre_install** into
-  /ssd/jetson-containers/data and
-- move forbidden_zone folder **from pre_install into the**
-  /ssd/jetson-containers/data/images folder and
-- move demo folder **from pre_install into the**
-  /ssd/jetson-containers/data/videos folder.
+#### Note
+- Cat tvm splited files together
+> $ cd edge_agent/pre_install
+> $ bash split-cat-tvm.sh
+- You need to place the nanodb folder **from pre_install to** /ssd/jetson-containers/data/
+> $ mv nanodb /ssd/jetson-container/data/
+- move forbidden_zone folder **from pre_install to** /ssd/jetson-containers/data/images/
+> $ mv forbidden_zone /ssd/jetson-container/data/images/
+- move demo folder **from pre_install to** /ssd/jetson-containers/data/videos/
+> $ mv demo /ssd/jetson-container/data/videos/
 
 4 Agent studio Container
 
