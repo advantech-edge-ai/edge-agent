@@ -10,7 +10,7 @@ Rapidly design and experiment with creating automation agents, personal assistan
 
 | Name           | Description                                        |
 | -------------- | -------------------------------------------------- |
-| Product        | MIC-733-OA4A1 (64GB)                               |
+| Product        | MIC-733-OA3A1 (32GB) / MIC-733-OA4A1 (64GB)        |
 | JetPack        | V6.0GA                                             |
 | Storage (NVMe) | 512GB (recommended)                                |
 | USB Camera     | Logitech c270 HD webcam or V4L2 compatible camera. |
@@ -224,7 +224,6 @@ bash jetson-containers/install.sh
 ```
 cd /ssd
 sudo apt install git-lfs
-git lfs install
 ```
 
 3\. Advantech Edge Agent repo
