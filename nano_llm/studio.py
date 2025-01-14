@@ -100,6 +100,19 @@ def main(log_file, **args):
                 child_process.kill()
             break
 
+        if child_process.returncode == 42 or child_process.returncode == 43 or child_process.returncode == 44:
+            crash_message = (
+                f"The subprocess exited abnormally (exit code: {child_process.returncode}). "
+            )
+            print(crash_message)
+            write_to_log(log_file, crash_message)
+            child_process.terminate()
+            try:
+                child_process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                child_process.kill()
+            break
+
         if child_process.returncode != 0:  # (Crash)
             crash_message = (
                 f"The subprocess exited abnormally (exit code: {child_process.returncode}). "

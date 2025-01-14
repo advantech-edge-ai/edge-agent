@@ -286,6 +286,7 @@ docker commit "your_container_id" dustynv/nano_llm:24.7-r36.2.0_bug_fixed
 ```
 jetson-containers run \--env HUGGINGFACE_TOKEN= hf_xyz123abc456 \
 -v /etc/machine-id:/etc/machine-id \
+-v /:/dummy_root:ro \
 -v /ssd/edge_agent:/opt/NanoLLM \
 -v /ssd/edge_agent/pre_install/project_presets:/data/nano_llm/presets \
 dustynv/nano_llm:24.7-r36.2.0_bug_fixed \
@@ -297,6 +298,7 @@ python3 -m nano_llm.studio
 ```
 jetson-containers run \
 -v /etc/machine-id:/etc/machine-id \
+-v /:/dummy_root:ro \
 -v /ssd/edge_agent:/opt/NanoLLM \
 -v /ssd/edge_agent/pre_install/project_presets:/data/nano_llm/presets \
 dustynv/nano_llm:24.7-r36.2.0_bug_fixed \
@@ -666,7 +668,7 @@ In the \"Video\" section of the toolbar, find and select the
 \"VideoSoruce Node.\" Then, make the following settings:
 
 -   Input: Select the location of your video
-    (/data/videos/Door_advan.mkv). This video should be located under
+    (/data/videos/demo/Door_advan.mkv). This video should be located under
     the same path in the jetson-containers folder.
 
 -   Loops: Set to -1 to enable continuous playback of the video.
@@ -988,7 +990,7 @@ In the \"Video\" section of the toolbar, find and select the
 \"VideoSoruce Node.\" Then, make the following settings:
 
 -   Input: Select the location of your video
-    (/data/videos/Attire_det_advan.avi). This video should be located
+    (/data/videos/demo/Attire_det_advan.avi). This video should be located
     under the same path in the jetson-containers folder.
 
 -   Loops: Set to -1 to enable continuous playback of the video.
@@ -1215,7 +1217,7 @@ In the \"Video\" section of the toolbar, find and select the
 \"VideoSoruce Node.\" Then, make the following settings:
 
 -   Input: Select the location of your video (Smoke:
-    /data/videos/Smoke_advan.mp4 \\ Fire: /data/videos/Fire_advan.mp4).
+    /data/videos/demo/Smoke_advan.mp4 \\ Fire: /data/videos/demo/Fire_advan.mp4).
     This video should be located under the same path in the
     jetson-containers folder.
 
@@ -1418,7 +1420,7 @@ In the \"Video\" section of the toolbar, find and select the
 \"VideoSoruce Node.\" Then, make the following settings:
 
 -   Input: Select the location of your video
-    (/data/videos/Forbidden_zone_advan.mp4). This video should be
+    (/data/videos/demo/Forbidden_zone_advan.mp4). This video should be
     located under the same path in the jetson-containers folder.
 
 -   Loops: Set to -1 to enable continuous playback of the video.
@@ -1580,6 +1582,414 @@ Here is how to connect the nodes as described:
     -   Connect the right interface of One_Step_Alert to the left
         interface of PiperTTS module.
 
+## NanoDB RAG (Load Forbidden_zone­_alert_webrtc_advan in presets)
+
+The core purpose of this application is to enhance the accuracy and
+adaptability of visual question-answering (QA) models when handling
+image-related questions. By combining Visual Language Models (VLM) with
+Retrieval-Augmented Generation (RAG) technology, we have created a
+workflow that automatically learns and optimizes over time.
+
+Specifically, when the model provides unsatisfactory answers to
+image-related questions, these "poorly answered" images are analyzed and
+tagged with additional information (e.g., core content, context, or
+object descriptions). The tagged images are then stored in an
+intelligent database. Later, when the system processes new questions
+with accompanying images, it retrieves similar images and their
+associated tags from the database to enrich the model's contextual
+understanding and improve the accuracy of its responses. This approach
+effectively addresses the limitations of traditional QA models in image
+interpretation.
+
+Step 1: Error Tagging and Labeling
+
+Step 2: Database Learning and Enrichment
+
+Step 3: Intelligent Retrieval and Answer Optimization
+
+### Step 1: Error Tagging and Labeling
+
+The application we are developing is for door status detection. The
+entire pipeline will be as follows.
+
+![](./images//media/image15.png){width="7.020833333333333in"
+height="2.9375in"}
+
+1.  #### VideoSource
+
+In the \"Video\" section of the toolbar, find and select the
+\"VideoSoruce Node.\" Then, make the following settings:
+
+-   Input: Select the location of your video
+    (/data/videos/demo/Door_RAG_advan.mp4). This video should be located
+    under the same path in the jetson-containers folder.
+
+-   Loops: Set to -1 to enable continuous playback of the video.
+
+2.  #### RateLimit
+
+In the \"Video\" section of the toolbar, find and select the \"RateLimit
+Node.\" Then, make the following settings:
+
+-   Set Rate to 15 This means 15 frames are processed per second.
+
+-   Leave Chunk empty: Use the default value, no special configuration
+    is needed.
+
+-   Set Drop inputs to True: This means only the latest frame is kept,
+    while older frames are discarded and not saved.
+
+3.  #### AutoPrompt_ICL
+
+In the \"LLM\" section of the toolbar, find and select the
+\"Autoprompt_ICL Node.\" Then, make the following settings:
+
+-   This is to let the model know whether the door is closed or open. So
+    the prompt is \<reset\>\<image\>Check the current the status of the
+    door. Is it open or closed?
+
+-   seq_replace_mode set to true: When this feature is enabled, each
+    new input will replace older ones step by step; if disabled, the
+    input buffer will clear itself automatically when full.
+
+-   Roi & Roi Coordinates: Represent the region of the incoming image
+    that we want to focus on. In this case, we are focusing on the full
+    image, so this feature does not need to be enabled. Simply set
+    **Roi** to **false**.
+
+4.  #### VILA-1.5-13B
+
+In the \"LLM\" section of the toolbar, find and select the NanoLLM\_ICL
+Node.\" Then, make the following settings:
+
+-   Model Selection: We chose Efficient-Large-Model/VILA-1.5-13B.
+
+-   API Selection: We opted for MLC as the API, which enhances inference
+    speed, allowing the system to respond more quickly.
+
+-   Quantization Setting: We used the default q8f16\_ft quantization, a
+    compression technique that reduces computational load while
+    maintaining model performance.
+
+-   MaxContextLength use the default setting, by default, inherited from
+    the model.
+
+-   Drop inputs set to True: This ensures that only the latest frame is
+    processed by the model, discarding older frames to ensure the model
+    always processes the most recent information.
+
+-   Chat Template selected as llava-v1: This is the foundational setting
+    for the model\'s chat system. Choosing a chat template that matches
+    the model\'s retraining process is crucial for maintaining model
+    performance; otherwise, it can severely impact system performance.
+
+-   System Prompt use the following description: A chat between a
+    curious human and an artificial intelligence assistant. The
+    assistant gives helpful, detailed, and polite answers to the
+    human\'s questions.
+
+5.  #### VideoOverlay
+
+In the \"Video\" section of the toolbar, find and select the
+\"VideoOverlay Node.\" Then, make the following settings:
+
+This part can use the default settings. This Node is intended to
+influence the font, typeface, and layout of the text output from the
+model when rendered on an image.
+
+6.  #### VideoOutput
+
+In the \" Video\" section of the toolbar, find and select the
+\"VideoOutput Node.\" Then, make the following settings:
+
+This part can use the default settings. This node is intended to
+determine where the output image should be projected and whether any
+related settings need adjustment, such as encoding the image into a
+specific format.
+
+As shown in the image above, the door is slightly open, yet the model
+still identifies it as being in a closed state. Therefore, we need to
+find ways to improve the model and enhance its performance.
+
+### Step 2: Database Learning and Enrichment
+
+![](./images//media/image16.png){width="7.010416666666667in"
+height="2.9375in"}
+
+We first create three nodes.
+
+1.  #### VideoSource
+
+In the \"Video\" section of the toolbar, find and select the
+\"VideoSoruce Node.\" Then, make the following settings:
+
+-   Input: Select the location of your video
+    (/data/videos/demo/Door_RAG_advan.mp4). This video should be located
+    under the same path in the jetson-containers folder.
+
+-   Loops: Set to -1 to enable continuous playback of the video.
+
+2.  #### VideoOutput
+
+In the \" Video\" section of the toolbar, find and select the
+\"VideoOutput Node.\" Then, make the following settings:
+
+This part can use the default settings. This node is intended to
+determine where the output image should be projected and whether any
+related settings need adjustment, such as encoding the image into a
+specific format.
+
+3.  #### NanoDB_Fashion
+
+> In the \"Database\" section of the toolbar, find and select the
+> \"NanoDB_Fashion Node.\" Then, make the following settings:
+
+-   Path: Default is the /data/nanodb/images. This setting defines the
+    directory where the NanoDB database will either be created or loaded
+    from.
+
+-   Model: Defaultset is openai/clip-vit-large-patch14-336. This
+    parameter specifies the embedding model to be used, either CLIP or
+    SigLIP. You can choose a model from HuggingFace or provide a local
+    path to use a custom model.
+
+-   Dtype: Defaultset is 16-bit floating point. This determines whether
+    the embeddings will be computed and stored as 16-bit or 32-bit
+    floating point numbers.
+
+-   Reserve: Default is 1024 MB. This setting reserves a specific amount
+    of memory in megabytes (MB) for the database vectors..
+
+-   Top K: Defaultset is top 16 results. This setting specifies how many
+    search results or the top K similar entries will be returned when
+    performing a search query. You can adjust this to return more or
+    fewer results based on your needs.
+
+-   Crop: Default is enabled. This parameter controls whether image
+    cropping should be enabled or disabled. CLIP was trained with image
+    cropping, so enabling it is recommended for CLIP. SigLIP does not
+    require cropping.
+
+-   Drop Inputs: Defaultset is ture. If true, only the latest message
+    from the input queue will be used (older messages dropped).
+
+-   Search Time: Format is Year/Month/Day. This specifies the format for
+    time-based searches. You should provide the time in the format
+    YYYY/MM/DD for date-specific queries, such as 2024/12/30.
+
+-   RAG Sample Size and RAG Threshold: In this application, we do not
+    need to use these two parameters. They represent the number of
+    samples defined by the Sample Size and the threshold value, which
+    are used to provide qualifying image tags to the node connected
+    downstream of the rag connection.
+
+Next, we need to add tags for specific images from the video into the
+database.
+
+We can pause the video by clicking the \"Stop\" button at the bottom
+left, which will stop the video and add a tag to store the image in the
+database. As shown in the image below, for the photo with the \"slightly
+open\" tag, the image will be saved to the database with the \" slightly
+open\" tag applied.
+
+![](./images//media/image17.png){width="7.010416666666667in"
+height="3.4479166666666665in"}
+
+We follow the same process to add several photos into the database, and
+finally complete the construction of our database.
+
+![](./images//media/image18.png){width="2.65625in"
+height="3.5208333333333335in"}
+![](./images//media/image19.png){width="2.5104166666666665in"
+height="3.53125in"}
+
+Tag: slightly open Tag: close
+
+![](./images//media/image20.png){width="2.6145833333333335in"
+height="4.0in"} ![](./images//media/image21.png){width="2.59375in"
+height="3.96875in"}
+
+Tag: close Tag: open
+
+![](./images//media/image22.png){width="2.75in" height="3.46875in"}
+
+Tag: open
+
+### Step 3: Intelligent Retrieval and Answer Optimization
+
+![](./images//media/image23.png){width="7.020833333333333in"
+height="3.09375in"}
+
+The final step is to enhance the model\'s response capability by
+expanding the database with nanoDB, following the settings below.
+
+1.  #### VideoSource
+
+In the \"Video\" section of the toolbar, find and select the
+\"VideoSoruce Node.\" Then, make the following settings:
+
+-   Input: Select the location of your video (/data/videos/demo/
+    Door_RAG_advan.mp4). This video should be located under the same
+    path in the jetson-containers folder.
+
+-   Loops: Set to -1 to enable continuous playback of the video.
+
+2.  #### RateLimit
+
+In the \"Video\" section of the toolbar, find and select the \"RateLimit
+Node.\" Then, make the following settings:
+
+-   Set Rate to 15: This means only one frame is processed per second
+    (i.e., only one frame per second).
+
+-   Leave Chunk empty: Use the default value, no special configuration
+    is needed.
+
+-   Set Drop inputs to True: This means only the latest frame is kept,
+    while older frames are discarded and not saved.
+
+3.  #### NanoDB_Fashion
+
+> In the \"Database\" section of the toolbar, find and select the
+> \"NanoDB_Fashion Node.\" Then, make the following settings:
+
+-   Path: Default is the /data/nanodb/images. This setting defines the
+    directory where the NanoDB database will either be created or loaded
+    from.
+
+-   Model: Defaultset is openai/clip-vit-large-patch14-336. This
+    parameter specifies the embedding model to be used, either CLIP or
+    SigLIP. You can choose a model from HuggingFace or provide a local
+    path to use a custom model.
+
+-   Dtype: Defaultset is 16-bit floating point. This determines whether
+    the embeddings will be computed and stored as 16-bit or 32-bit
+    floating point numbers.
+
+-   Reserve: Default is 1024 MB. This setting reserves a specific amount
+    of memory in megabytes (MB) for the database vectors..
+
+-   Top K: Defaultset is top 16 results. This setting specifies how many
+    search results or the top K similar entries will be returned when
+    performing a search query. You can adjust this to return more or
+    fewer results based on your needs.
+
+-   Crop: Default is enabled. This parameter controls whether image
+    cropping should be enabled or disabled. CLIP was trained with image
+    cropping, so enabling it is recommended for CLIP. SigLIP does not
+    require cropping.
+
+-   Drop Inputs: Defaultset is ture. If true, only the latest message
+    from the input queue will be used (older messages dropped).
+
+-   Search Time: Format is Year/Month/Day. This specifies the format for
+    time-based searches. You should provide the time in the format
+    YYYY/MM/DD for date-specific queries, such as 2024/12/30.RAG Sample
+    Size and RAG Threshold: In this application, we choose one photo
+    with a threshold greater than 90, tag it, and pass it as a string of
+    text to the downstream node. So RAG Sample Size set to 1 and RAG
+    Threshold set it to 90.
+
+4.  #### Autoprompt_ICL
+
+> in the \"LLM\" section of the toolbar, find and select the
+> \"Autoprompt_ICL Node.\" Then, make the following settings:
+
+-   This is to let the model know whether the door is closed or open. So
+    the prompt is \<reset\>\<text\>\<image\>Check the current the status
+    of the door. Is it open or closed?
+
+-   seq_replace_mode set to true: When this feature is enabled, each
+    new input will replace older ones step by step; if disabled, the
+    input buffer will clear itself automatically when full.
+
+-   Roi & Roi Coordinates: Represent the region of the incoming image
+    that we want to focus on. In this case, we are focusing on the full
+    image, so this feature does not need to be enabled. Simply set
+    **Roi** to **false**.
+
+7.  #### VILA-1.5-13B
+
+In the \"LLM\" section of the toolbar, find and select the NanoLLM\_ICL
+Node.\" Then, make the following settings:
+
+-   Model Selection: We chose Efficient-Large-Model/VILA-1.5-13B.
+
+-   API Selection: We opted for MLC as the API, which enhances inference
+    speed, allowing the system to respond more quickly.
+
+-   Quantization Setting: We used the default q8f16\_ft quantization, a
+    compression technique that reduces computational load while
+    maintaining model performance.
+
+-   MaxContextLength use the default setting, by default, inherited from
+    the model.
+
+-   Drop inputs set to True: This ensures that only the latest frame is
+    processed by the model, discarding older frames to ensure the model
+    always processes the most recent information.
+
+-   Chat Template selected as llava-v1: This is the foundational setting
+    for the model\'s chat system. Choosing a chat template that matches
+    the model\'s retraining process is crucial for maintaining model
+    performance; otherwise, it can severely impact system performance.
+
+-   System Prompt use the following description: A chat between a
+    curious human and an artificial intelligence assistant. The
+    assistant gives helpful, detailed, and polite answers to the
+    human\'s questions.
+
+5.  #### VideoOverlay
+
+In the \"Video\" section of the toolbar, find and select the
+\"VideoOverlay Node.\" Then, make the following settings:
+
+This part can use the default settings. This Node is intended to
+influence the font, typeface, and layout of the text output from the
+model when rendered on an image.
+
+6.  #### VideoOutput
+
+In the \" Video\" section of the toolbar, find and select the
+\"VideoOutput Node.\" Then, make the following settings:
+
+This part can use the default settings. This node is intended to
+determine where the output image should be projected and whether any
+related settings need adjustment, such as encoding the image into a
+specific format.
+
+Here is how to connect the nodes as described:
+
+1.  **Connect the VideoSource node:**
+
+    -   Connect the right interface of VideoSource to the left interface
+        of RateLimit and the left interface of VideoOverlay.
+
+2.  **Connect the RateLimit node:**
+
+    -   Connect the right interface of RateLimit to the left interface
+        of Autoprompt\_ICL and the left interface of NanoDB\_Fashion .
+
+3.  **Connect the AutoPrompt\_ICL node:**
+
+    -   Connect the right interface of Autoprompt\_ICL to the left
+        interface of VILA1.5-13b.
+
+4.  **Connect the NanoDB\_Fashion node:**
+
+    -   Connect the right interface of NanoDB\_Fashion to the left
+        interface of AutoPrompt\_ICL.
+
+5.  **Connect the VILA1.5-13b node:**
+
+    -   Connect the right interface\'s **partial** output of VILA1.5-13b
+        to the left interface of VideoOverlay.
+
+6.  **Connect the VideoOverlay node:**
+
+    -   Connect the right interface of VideoOverlay to the left
+        interface of VideoOutput.
+        
 # Reference
 
 \[1\] NVIDIA Jetson Generative AI Lab,
@@ -1601,3 +2011,4 @@ Here is how to connect the nodes as described:
 -   MLC: Machine Learning Compilation
 
 -   V4L2: Video4Linux Version 2
+

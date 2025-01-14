@@ -466,7 +466,7 @@ function addNanoDBWidget(name, id, title, grid_options) {
     
     <div style="margin-bottom: 15px;"> 
       <label for="${input_id}" style="display: block; margin-bottom: 5px; font-weight: bold; color: #eeeeee;">
-        Search
+        Search by Vision
       </label>
       <div class="input-group">
         <input id="${input_id}" class="form-control" placeholder="Enter a search query"></input>
