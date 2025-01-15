@@ -1612,8 +1612,7 @@ Step 3: Intelligent Retrieval and Answer Optimization
 The application we are developing is for door status detection. The
 entire pipeline will be as follows.
 
-![](./images//media/image15.png){width="7.020833333333333in"
-height="2.9375in"}
+![](./images/media/image15.png)
 
 1.  #### VideoSource
 
@@ -1713,8 +1712,7 @@ find ways to improve the model and enhance its performance.
 
 ### Step 2: Database Learning and Enrichment
 
-![](./images//media/image16.png){width="7.010416666666667in"
-height="2.9375in"}
+![](./images/media/image16.png)
 
 We first create three nodes.
 
@@ -1792,33 +1790,26 @@ database. As shown in the image below, for the photo with the \"slightly
 open\" tag, the image will be saved to the database with the \" slightly
 open\" tag applied.
 
-![](./images//media/image17.png){width="7.010416666666667in"
-height="3.4479166666666665in"}
+![](./images/media/image17.png)
 
 We follow the same process to add several photos into the database, and
 finally complete the construction of our database.
 
-![](./images//media/image18.png){width="2.65625in"
-height="3.5208333333333335in"}
-![](./images//media/image19.png){width="2.5104166666666665in"
-height="3.53125in"}
+Tag: slightly open
+![](./images/media/image18.png) 
+Tag: close
+![](./images/media/image19.png)
 
-Tag: slightly open Tag: close
-
-![](./images//media/image20.png){width="2.6145833333333335in"
-height="4.0in"} ![](./images//media/image21.png){width="2.59375in"
-height="3.96875in"}
-
-Tag: close Tag: open
-
-![](./images//media/image22.png){width="2.75in" height="3.46875in"}
-
+Tag: close
+![](./images/media/image20.png) 
+ Tag: open
+![](./images/media/image21.png)
 Tag: open
+![](./images/media/image22.png)
 
 ### Step 3: Intelligent Retrieval and Answer Optimization
 
-![](./images//media/image23.png){width="7.020833333333333in"
-height="3.09375in"}
+![](./images/media/image23.png)
 
 The final step is to enhance the model\'s response capability by
 expanding the database with nanoDB, following the settings below.
