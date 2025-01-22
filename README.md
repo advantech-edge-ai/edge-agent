@@ -219,31 +219,31 @@ git clone https://github.com/dusty-nv/jetson-containers
 bash jetson-containers/install.sh
 ```
 
-2\. NanoLLM
+2\. git clone Advantech Edge Agent repo, and do manually pre-configuration
 
 ```
+# git clone edge_agent base environment
 cd /ssd
-sudo apt install git-lfs
-```
-
-3\. Advantech Edge Agent repo
-
-```
 git clone https://github.com/advantech-edge-ai/edge_agent.git
-```
-#### Notes
-- In order to join tvm splited files into the tvm-0.15.0-cp310-cp310-linux_aarch64.whl
-> $ cd edge_agent/pre_install
-> 
-> $ bash split-cat-tvm.sh
-- Place the nanodb folder **from pre_install to** /ssd/jetson-containers/data/
-> $ mv nanodb /ssd/jetson-container/data/
-- move forbidden_zone folder **from pre_install to** /ssd/jetson-containers/data/images/
-> $ mv forbidden_zone /ssd/jetson-container/data/images/
-- move demo folder **from pre_install to** /ssd/jetson-containers/data/videos/
-> $ mv demo /ssd/jetson-container/data/videos/
 
-4 Agent studio Container
+# copy large files from docker image
+sudo docker run --name share-volume00-container ispsae/share-volume00
+sudo docker cp share-volume00-container:/data/. /ssd/edge_agent/pre_install/
+
+# move engine file
+mv /ssd/edge_agent/pre_install/owlv2.engine /ssd/edge_agent/nanoowl/data/
+
+# go to working folder & untar demo folder
+cd /ssd/edge_agent/pre_install
+tar xfz demo-videos.tgz --strip-components=1
+
+# move nanodb, images, demo videos to /ssd/jetson-container/... 
+mv nanodb /ssd/jetson-container/data/
+mv forbidden_zone /ssd/jetson-container/data/images/
+mv demo /ssd/jetson-container/data/videos/
+```
+
+3\. Agent studio Container
 
 ```
 docker pull dustynv/nano_llm:24.7-r36.2.0
@@ -263,18 +263,22 @@ dustynv/nano_llm:24.7-r36.2.0 \
 This will take a while to build and install like 15 mins. Check there is no error happened.
 
 ```
+# do preinstall inside container
+# just ignore the awq package installation error
 cd /opt/NanoLLM/pre_install && sh pre_install.sh
+# do NOT exit container before new docker image be committed
 ```
 
 \# Commit a new docker images with fixes
 
 ```
-docker commit "your_container_id" dustynv/nano_llm:24.7-r36.2.0_bug_fixed
+# open another termial and query the container id
+# or get the latest one
+sudo docker commit `docker ps -q -l` dustynv/nano_llm:24.7-r36.2.0_bug_fixed
 ```
 
 
-
-4.  Register on the HuggingFace Website to Obtain an Access Token (In
+4\. Register on the HuggingFace Website to Obtain an Access Token (In
     the Settings)
 
 ![](./images/media/image3.png)
