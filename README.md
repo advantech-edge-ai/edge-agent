@@ -10,7 +10,7 @@ Rapidly design and experiment with creating automation agents, personal assistan
 
 | Name           | Description                                        |
 | -------------- | -------------------------------------------------- |
-| Product        | MIC-733-OA3A1 (32GB) / MIC-733-OA4A1 (64GB)        |
+| Product        | MIC-733-AO5A1 (32GB) / MIC-733-AO6A1 (64GB)        |
 | JetPack        | V6.0GA                                             |
 | Storage (NVMe) | 512GB (recommended)                                |
 | USB Camera     | Logitech c270 HD webcam or V4L2 compatible camera. |
