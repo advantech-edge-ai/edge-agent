@@ -1,8 +1,10 @@
-# Edge Agent
+# Advantech Edge Agent
 
-Edge Agent is an interactive sandbox designed to facilitate the rapid design and experimentation of automation agents, personal assistants, and edge AI systems. It seamlessly integrates multimodal Large Language Models (LLMs), speech and vision transformers, vector databases, prompt templates, and function calling with live sensors and I/O. Optimized for deployment on Jetson devices, it offers on-device computing, low-latency streaming, and unified memory for enhanced performance.
+Advantech Edge Agent is an interactive sandbox designed to facilitate the rapid design and experimentation of automation agents, personal assistants, and edge AI systems. It seamlessly integrates multimodal Large Language Models (LLMs), speech and vision transformers, vector databases, prompt templates, and function calling with live sensors and I/O. Optimized for deployment on Jetson devices, it offers on-device computing, low-latency streaming, and unified memory for enhanced performance.
 
 ![](./images/media/image2.png)
+
+> 💡Advantech Edge Agent is built on Agent Studio from Jetson AI Lab, enhanced with additional custom features. Users may find the [official tutorial](https://www.jetson-ai-lab.com/tutorial-intro.html), the [Jetson Forums](https://forums.developer.nvidia.com/c/agx-autonomous-machines/jetson-embedded-systems/jetson-projects/78) and [GitHub Issues](https://github.com/dusty-nv/NanoLLM) from NVIDIA helpful.
 
 ## Features
 
@@ -22,6 +24,65 @@ Edge Agent is an interactive sandbox designed to facilitate the rapid design and
 | Storage         | 512GB NVMe SSD (recommended)                          |
 | USB Camera      | Logitech c270 HD webcam or any V4L2 compatible camera |
 | Internet        | Required during installation                          |
+
+### Docker Installation
+
+Ensure your system has Docker installed. Check the version of Docker:
+```sh
+docker --version
+# or run the docker command with sudo
+# sudo docker --version
+```
+
+Install Docker on your system:
+
+1. Make NVIDIA's Jetson apt source available
+   ```sh
+   sudo vi /etc/apt/sources.list.d/nvidia-l4t-apt-source.list
+   ```
+   Uncomment the lines as the following:
+   ```sh
+   deb https://repo.download.nvidia.com/jetson/common r36.4 main
+   deb https://repo.download.nvidia.com/jetson/t234 r36.4 main
+   deb https://repo.download.nvidia.com/jetson/ffmpeg r36.4 main
+   ```
+2. Manually install Docker and set it up:
+   ```sh
+   sudo apt update
+   sudo apt install -y nvidia-container curl
+   curl https://get.docker.com | sh && sudo systemctl --now enable docker
+   sudo nvidia-ctk runtime configure --runtime=docker
+   ```
+3. Restart the Docker service and add your user to the Docker group to run commands without sudo:
+   ```sh
+   sudo systemctl restart docker
+   sudo usermod -aG docker $USER
+   newgrp docker
+   ```
+   Check the Docker installation with the command:
+   ```sh
+   docker --version
+   ```
+4. Add default runtime in `/etc/docker/daemon.json`:
+   ```sh
+   sudo vi /etc/docker/daemon.json
+   ```
+   Insert the `"default-runtime": "nvidia"` line as following:
+   ```json
+   {
+    "runtimes": {
+        "nvidia": {
+            "path": "nvidia-container-runtime",
+            "runtimeArgs": []
+         }
+      },
+    "default-runtime": "nvidia"
+   }
+   ```
+5. Restart Docker:
+   ```sh
+   sudo systemctl daemon-reload && sudo systemctl restart docker
+   ```
 
 ###  SSD Installation 
 
@@ -83,6 +144,8 @@ Edge Agent is an interactive sandbox designed to facilitate the rapid design and
 
 ### Migrate Docker Directory to SSD
 
+With the SSD installed, you can use the extra storage for the Docker directory.
+
 1. Stop Docker:
    ```sh
    sudo systemctl stop docker
@@ -102,11 +165,11 @@ Edge Agent is an interactive sandbox designed to facilitate the rapid design and
    ```json
    {
     "runtimes": {
-    "nvidia": {
-      "args": [],
-      "path": "nvidia-container-runtime"
-      }
-    },
+        "nvidia": {
+            "path": "nvidia-container-runtime",
+            "runtimeArgs": []
+         }
+      },
     "default-runtime": "nvidia",
     "data-root": "/ssd/docker"
    }
@@ -124,19 +187,12 @@ Edge Agent is an interactive sandbox designed to facilitate the rapid design and
    sudo journalctl -u docker
    ```
 
-### Disable Apport Reporting (Optional)
+### ☕ Take a Break: Optional Steps
 
-To prevent crash reports from consuming storage, disable Apport:
+At this stage, you have installed Docker and an SSD on your device and set the SSD as the default storage location for Docker images. You can follow these optional steps to verify that the SSD is configured correctly for Docker images and disable Apport reporting:
 
-1. Edit the configuration:
-   ```sh
-   sudo vim /etc/default/apport
-   ```
-   Set `enabled=0`.
-2. Disable the service:
-   ```sh
-   sudo systemctl stop apport && sudo systemctl disable apport
-   ```
+- [Test Docker SSD]()
+- [Disable Apport Reporting]()
 
 ### Download Essential Data
 
@@ -148,11 +204,10 @@ To prevent crash reports from consuming storage, disable Apport:
    ```
 2. Clone Edge Agent and pre-configure:
    ```sh
-   cd /ssd
-   git clone https://github.com/advantech-edge-ai/edge_agent.git
+   git clone https://github.com/advantech-EdgeAI/edge_agent.git
 
-   sudo docker run --name share-volume00-container ispsae/share-volume00
-   sudo docker cp share-volume00-container:/data/. /ssd/edge_agent/pre_install/
+   docker run --name share-volume00-container ispsae/share-volume00
+   docker cp share-volume00-container:/data/. /ssd/edge_agent/pre_install/
 
    mv /ssd/edge_agent/pre_install/owlv2.engine /ssd/edge_agent/nanoowl/data/
    ```
@@ -163,9 +218,9 @@ To prevent crash reports from consuming storage, disable Apport:
    ```
 4. Move data to Jetson containers:
    ```sh
-   mv nanodb /ssd/jetson-container/data/
-   mv forbidden_zone /ssd/jetson-container/data/images/
-   mv demo /ssd/jetson-container/data/videos/
+   mv nanodb /ssd/jetson-containers/data/
+   mv forbidden_zone /ssd/jetson-containers/data/images/
+   mv demo /ssd/jetson-containers/data/videos/
    ```
 5. Pull the Agent Studio container:
    ```sh
