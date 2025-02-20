@@ -13,6 +13,8 @@ Advantech Edge Agent is an interactive sandbox designed to facilitate the rapid 
 - **Real-Time Sensor Integration**: Connect and interact with live sensors and I/O for real-world applications.
 - **Optimized for Jetson Devices**: Leverage on-device computing and low-latency streaming for enhanced performance.
 
+> 💡Learn more about [Practical Examples](https://github.com/advantech-EdgeAI/edge_agent/wiki#practical-examples) of using Edge Agent in wiki.
+
 ## Installation
 
 ### System Requirements
@@ -191,8 +193,8 @@ With the SSD installed, you can use the extra storage for the Docker directory.
 
 At this stage, you have installed Docker and an SSD on your device and set the SSD as the default storage location for Docker images. You can follow these optional steps to verify that the SSD is configured correctly for Docker images and disable Apport reporting:
 
-- [Test Docker SSD]()
-- [Disable Apport Reporting]()
+- [Test Docker on SSD](https://github.com/advantech-EdgeAI/edge_agent/wiki/Test-Docker-on-SSD)
+- [Disable Apport Reporting](https://github.com/advantech-EdgeAI/edge_agent/wiki/Disable-Apport-Reporting)
 
 ### Download Essential Data
 
